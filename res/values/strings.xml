@@ -33,9 +33,28 @@
     <string name="title_paired_devices">Paired Devices</string>
     <string name="title_other_devices">Other Available Devices</string>
     <string name="button_scan">Scan for devices</string>
+    <string name="ID_String">BC</string>
 
     <!-- Options Menu -->
     <string name="secure_connect">Connect a device - Secure</string>
     <string name="insecure_connect">Connect a device - Insecure</string>
     <string name="discoverable">Make discoverable</string>
+    <string name="user_info_button">Personal Information</string>
+    <string name="prefs_button">Preferences</string>
+    
+    <!-- User Info/Preferences -->
+    <string name="user_info"></string>
+    <string name="prefs"></string>
+    <string name="pref_age1">Less than 20</string>
+    <string name="pref_age2">20-29</string>
+    <string name="pref_age3">30-39</string>
+    <string name="pref_age4">40-49</string>
+    <string name="pref_age5">50-59</string>
+    <string name="pref_age6">60-69</string>
+    <string name="pref_age7">70-79</string>
+    <string name="pref_age8">80 or older</string>
+    <string name="pref_gender1">Male</string>
+    <string name="pref_gender2">Female</string>
+    <string name="pref_all">All</string>
+    
 </resources>

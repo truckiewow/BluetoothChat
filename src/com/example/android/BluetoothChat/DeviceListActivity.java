@@ -16,6 +16,7 @@
 
 package com.example.android.BluetoothChat;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import android.app.Activity;
@@ -28,14 +29,14 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 /**
  * This Activity appears as a dialog. It lists any paired devices and
@@ -55,6 +56,9 @@ public class DeviceListActivity extends Activity {
     private BluetoothAdapter mBtAdapter;
     private ArrayAdapter<String> mPairedDevicesArrayAdapter;
     private ArrayAdapter<String> mNewDevicesArrayAdapter;
+    
+    private ArrayList<Integer> mAge;
+    private ArrayList<Integer> mGender;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +71,11 @@ public class DeviceListActivity extends Activity {
         // Set result CANCELED in case the user backs out
         setResult(Activity.RESULT_CANCELED);
 
+        // Set arrayLists of acceptable users
+        Intent intent = getIntent();
+        mAge = intent.getIntegerArrayListExtra(PrefsActivity.AGE);
+        mGender = intent.getIntegerArrayListExtra(PrefsActivity.GENDER);
+        
         // Initialize the button to perform device discovery
         Button scanButton = (Button) findViewById(R.id.button_scan);
         scanButton.setOnClickListener(new OnClickListener() {
@@ -109,7 +118,10 @@ public class DeviceListActivity extends Activity {
         if (pairedDevices.size() > 0) {
             findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
             for (BluetoothDevice device : pairedDevices) {
-                mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+            	String temp = device.getName();//
+            	if(true) //temp.matches(
+            	mPairedDevicesArrayAdapter.add(temp.substring(0,temp.length()-4) + "\n" + device.getAddress());//
+                //mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }
         } else {
             String noDevices = getResources().getText(R.string.none_paired).toString();
@@ -179,14 +191,32 @@ public class DeviceListActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-            // When discovery finds a device
+            // When discovery finds a devicE
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // If it's already paired, skip it, because it's been listed already
-                if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-                    mNewDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-                }
+           //     if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+                	String id_String = device.getName().substring(device.getName().length()-4);
+                	if(D) Log.i(TAG, id_String);
+                	if(D) {
+                		String temp = "Acceptable: {";
+                		for(Integer i : mGender) {
+                			temp += i;
+                		}
+                		temp+= "}{";
+                		for(Integer i: mAge) {
+                			temp += i;
+                		}
+                		temp += "}";
+                		Log.i(TAG, temp);
+                	}
+                	if( (mGender.contains(Integer.parseInt(""+id_String.charAt(2)))) && (mAge.contains(Integer.parseInt(""+id_String.charAt(3))))) {
+                		String name = device.getName().substring(0,device.getName().length()-4);
+                	
+                		mNewDevicesArrayAdapter.add(name + "\n" + device.getAddress());
+                	}
+  //              }
             // When discovery is finished, change the Activity title
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 setProgressBarIndeterminateVisibility(false);

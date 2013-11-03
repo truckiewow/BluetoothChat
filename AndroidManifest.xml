@@ -17,7 +17,8 @@
       package="com.example.android.BluetoothChat"
       android:versionCode="1"
       android:versionName="1.0">
-    <uses-sdk minSdkVersion="6" />
+    <uses-sdk android:minSdkVersion="11"
+        android:targetSdkVersion="17" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
 
@@ -35,5 +36,15 @@
                   android:label="@string/select_device"
                   android:theme="@android:style/Theme.Holo.Dialog"
                   android:configChanges="orientation|keyboardHidden" />
-    </application>
+        <activity android:name=".UserInfoActivity"
+            	  android:label="@string/user_info_button"
+            	  android:theme="@android:style/Theme.Holo.Dialog"
+            	  android:configChanges="orientation|keyboardHidden">
+        </activity>
+        <activity android:name=".PrefsActivity"
+            	  android:label="@string/prefs_button"
+            	  android:theme="@android:style/Theme.Holo.Dialog"
+            	  android:configChanges="orientation|keyboardHidden">
+        </activity>
+     </application>
 </manifest>

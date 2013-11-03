@@ -16,6 +16,8 @@
 
 package com.example.android.BluetoothChat;
 
+import java.util.ArrayList;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -30,7 +32,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
@@ -55,7 +56,6 @@ public class BluetoothChat extends Activity {
     public static final int MESSAGE_DEVICE_NAME = 4;
     public static final int MESSAGE_TOAST = 5;
 
-    // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
@@ -63,6 +63,8 @@ public class BluetoothChat extends Activity {
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
+    private static final int REQUEST_USER_INFO = 4;
+    private static final int REQUEST_PREFS = 5;
 
     // Layout Views
     private ListView mConversationView;
@@ -78,7 +80,14 @@ public class BluetoothChat extends Activity {
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for the chat services
-    private BluetoothChatService mChatService = null;
+    private BluetoothChatService mChatService = null; 
+    
+    //Original friendly name of this bluetooth device
+    private String oldName;
+    //For filtering by this app users and their preferences
+    //public String IDString = "TESTHERE:";
+    private ArrayList<Integer> mAge;
+    private ArrayList<Integer> mGender;
 
 
     @Override
@@ -98,6 +107,10 @@ public class BluetoothChat extends Activity {
             finish();
             return;
         }
+        
+        oldName = mBluetoothAdapter.getName();
+        mAge = new ArrayList<Integer>(0);
+        mGender = new ArrayList<Integer>(0);
     }
 
     @Override
@@ -181,6 +194,7 @@ public class BluetoothChat extends Activity {
         // Stop the Bluetooth chat services
         if (mChatService != null) mChatService.stop();
         if(D) Log.e(TAG, "--- ON DESTROY ---");
+        mBluetoothAdapter.setName(oldName);
     }
 
     private void ensureDiscoverable() {
@@ -244,6 +258,7 @@ public class BluetoothChat extends Activity {
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+        	String temp;
             switch (msg.what) {
             case MESSAGE_STATE_CHANGE:
                 if(D) Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
@@ -275,12 +290,14 @@ public class BluetoothChat extends Activity {
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
-                mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
+            	temp = msg.getData().getString(DEVICE_NAME);
+                mConnectedDeviceName = temp.substring(0,temp.length()-4);
                 Toast.makeText(getApplicationContext(), "Connected to "
                                + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                 break;
             case MESSAGE_TOAST:
-                Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
+            	temp = msg.getData().getString(TOAST);
+                Toast.makeText(getApplicationContext(), temp.substring(0,temp.length()-4),
                                Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -313,7 +330,26 @@ public class BluetoothChat extends Activity {
                 Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
                 finish();
             }
+        case REQUEST_USER_INFO:
+        	if(resultCode == Activity.RESULT_OK) {
+        		String id_string = data.getStringExtra(UserInfoActivity.ID);
+                mBluetoothAdapter.setName(oldName+id_string);
+        	} else { 
+        		Log.d(TAG, "User info not ok");
+        		Toast.makeText(this, "this failed,  Sorry", Toast.LENGTH_SHORT).show();
+        		finish();
+        	}
+        case REQUEST_PREFS:
+        	if(resultCode == Activity.RESULT_OK) {
+        		mAge = data.getIntegerArrayListExtra(PrefsActivity.AGE);
+        		mGender = data.getIntegerArrayListExtra(PrefsActivity.GENDER);
+        	} else { 
+        		Log.d(TAG, "Prefs not ok");
+        		Toast.makeText(this, "this failed,  Sorry", Toast.LENGTH_SHORT).show();
+        		finish();
+        	}
         }
+    
     }
 
     private void connectDevice(Intent data, boolean secure) {
@@ -340,17 +376,32 @@ public class BluetoothChat extends Activity {
         case R.id.secure_connect_scan:
             // Launch the DeviceListActivity to see devices and do scan
             serverIntent = new Intent(this, DeviceListActivity.class);
+            serverIntent.putExtra(PrefsActivity.AGE,mAge);
+            serverIntent.putExtra(PrefsActivity.GENDER,mGender);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
             return true;
         case R.id.insecure_connect_scan:
             // Launch the DeviceListActivity to see devices and do scan
             serverIntent = new Intent(this, DeviceListActivity.class);
+            serverIntent.putExtra(PrefsActivity.AGE,mAge);
+            serverIntent.putExtra(PrefsActivity.GENDER,mGender);
             startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
             return true;
         case R.id.discoverable:
             // Ensure this device is discoverable by others
             ensureDiscoverable();
             return true;
+        case R.id.user_info:
+        	if(D) Log.i(TAG, "Attempting to load USER_INFO");
+        	serverIntent = new Intent(this, UserInfoActivity.class);
+        	if(D) Log.i(TAG, "After Creating intent");
+        	startActivityForResult(serverIntent,REQUEST_USER_INFO);
+        	if(D) Log.i(TAG, "After attempting to load USER_INFO");
+        	return true;
+        case R.id.prefs:
+        	serverIntent = new Intent(this,PrefsActivity.class);
+        	startActivityForResult(serverIntent,REQUEST_PREFS);
+        	return true;
         }
         return false;
     }
