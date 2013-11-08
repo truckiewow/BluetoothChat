@@ -90,9 +90,9 @@ public class UserInfoActivity extends Activity {
 		mButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				
-				String ID_string = getString(R.string.ID_String);
+				String ID_string = "[" + getString(R.string.ID_String);
 			    ID_string += mGender;
-			    ID_string += mAge;
+			    ID_string += mAge + "]";
 			    Intent intent = new Intent();
 			    intent.putExtra(ID, ID_string);
 				setResult(Activity.RESULT_OK, intent);

@@ -109,6 +109,14 @@ public class BluetoothChat extends Activity {
         }
         
         oldName = mBluetoothAdapter.getName();
+        if(oldName.matches(".*\\["+ getString(R.string.ID_String) + "[0-9]{2}]" )) {
+        	String tempOldName[] = oldName.split("\\[");
+        	oldName = tempOldName[0];
+        	for(int i=1; i<tempOldName.length-1; i++) { //rebuild string incase it contained a '['
+        		oldName+= "[" + tempOldName[i];
+        	}
+        	
+        }
         mAge = new ArrayList<Integer>(0);
         mGender = new ArrayList<Integer>(0);
     }
@@ -291,13 +299,13 @@ public class BluetoothChat extends Activity {
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
             	temp = msg.getData().getString(DEVICE_NAME);
-                mConnectedDeviceName = temp.substring(0,temp.length()-4);
+            	if(temp.matches(".*\\[" + getString(R.string.ID_String) + "[0-9]{2}]")) mConnectedDeviceName = temp.substring(0,temp.length()-6);
+            	else mConnectedDeviceName = temp;
                 Toast.makeText(getApplicationContext(), "Connected to "
                                + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
                 break;
             case MESSAGE_TOAST:
-            	temp = msg.getData().getString(TOAST);
-                Toast.makeText(getApplicationContext(), temp.substring(0,temp.length()-4),
+                Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
                                Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -330,6 +338,7 @@ public class BluetoothChat extends Activity {
                 Toast.makeText(this, R.string.bt_not_enabled_leaving, Toast.LENGTH_SHORT).show();
                 finish();
             }
+            break;
         case REQUEST_USER_INFO:
         	if(resultCode == Activity.RESULT_OK) {
         		String id_string = data.getStringExtra(UserInfoActivity.ID);
@@ -339,6 +348,7 @@ public class BluetoothChat extends Activity {
         		Toast.makeText(this, "this failed,  Sorry", Toast.LENGTH_SHORT).show();
         		finish();
         	}
+        	break;
         case REQUEST_PREFS:
         	if(resultCode == Activity.RESULT_OK) {
         		mAge = data.getIntegerArrayListExtra(PrefsActivity.AGE);
@@ -348,6 +358,7 @@ public class BluetoothChat extends Activity {
         		Toast.makeText(this, "this failed,  Sorry", Toast.LENGTH_SHORT).show();
         		finish();
         	}
+        	break;
         }
     
     }
@@ -402,6 +413,9 @@ public class BluetoothChat extends Activity {
         	serverIntent = new Intent(this,PrefsActivity.class);
         	startActivityForResult(serverIntent,REQUEST_PREFS);
         	return true;
+        case R.id.load:
+        	//do stuff
+            return true;
         }
         return false;
     }

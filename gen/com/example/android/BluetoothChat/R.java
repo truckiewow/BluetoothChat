@@ -35,6 +35,7 @@ public final class R {
         public static final int edit_text_out=0x7f060008;
         public static final int in=0x7f060007;
         public static final int insecure_connect_scan=0x7f060029;
+        public static final int load=0x7f06002d;
         public static final int new_devices=0x7f060005;
         public static final int paired_devices=0x7f060003;
         public static final int prefs=0x7f06002c;

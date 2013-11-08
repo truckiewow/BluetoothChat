@@ -119,7 +119,7 @@ public class DeviceListActivity extends Activity {
             findViewById(R.id.title_paired_devices).setVisibility(View.VISIBLE);
             for (BluetoothDevice device : pairedDevices) {
             	String temp = device.getName();//
-            	if(true) //temp.matches(
+            	if(temp.matches(".*["+ getString(R.string.ID_String) + "[0-9]{2}]"))
             	mPairedDevicesArrayAdapter.add(temp.substring(0,temp.length()-4) + "\n" + device.getAddress());//
                 //mPairedDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
             }
@@ -197,7 +197,8 @@ public class DeviceListActivity extends Activity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 // If it's already paired, skip it, because it's been listed already
            //     if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
-                	String id_String = device.getName().substring(device.getName().length()-4);
+                if(device.getName().matches(".*\\[" + getString(R.string.ID_String) + "[0-9]{2}]")) {
+                	String id_String = device.getName().substring(device.getName().length()-6);
                 	if(D) Log.i(TAG, id_String);
                 	if(D) {
                 		String temp = "Acceptable: {";
@@ -211,12 +212,12 @@ public class DeviceListActivity extends Activity {
                 		temp += "}";
                 		Log.i(TAG, temp);
                 	}
-                	if( (mGender.contains(Integer.parseInt(""+id_String.charAt(2)))) && (mAge.contains(Integer.parseInt(""+id_String.charAt(3))))) {
-                		String name = device.getName().substring(0,device.getName().length()-4);
+                	if( (mGender.contains(Integer.parseInt(""+id_String.charAt(3)))) && (mAge.contains(Integer.parseInt(""+id_String.charAt(4))))) {
+                		String name = device.getName().substring(0,device.getName().length()-6);
                 	
                 		mNewDevicesArrayAdapter.add(name + "\n" + device.getAddress());
                 	}
-  //              }
+                }
             // When discovery is finished, change the Activity title
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 setProgressBarIndeterminateVisibility(false);
