@@ -120,6 +120,13 @@
         android:textSize="20sp" />
 
     <Button
+        android:id="@+id/PrefsSelectButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/PrefsButton1"
+        android:text="Select All / Deselect All" />
+    
+    <Button
         android:id="@+id/PrefsButton1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

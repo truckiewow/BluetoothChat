@@ -64,7 +64,8 @@ public class BluetoothChat extends Activity {
     private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
     private static final int REQUEST_ENABLE_BT = 3;
     private static final int REQUEST_USER_INFO = 4;
-    private static final int REQUEST_PREFS = 5;
+    private static final int REQUEST_PREFS_SEC = 5;
+    private static final int REQUEST_PREFS_INS = 6;
 
     // Layout Views
     private ListView mConversationView;
@@ -119,6 +120,9 @@ public class BluetoothChat extends Activity {
         }
         mAge = new ArrayList<Integer>(0);
         mGender = new ArrayList<Integer>(0);
+        
+        Intent intent = new Intent(this, UserInfoActivity.class);
+        startActivityForResult(intent, REQUEST_USER_INFO);
     }
 
     @Override
@@ -313,6 +317,7 @@ public class BluetoothChat extends Activity {
     };
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	Intent intent = null;
         if(D) Log.d(TAG, "onActivityResult " + resultCode);
         switch (requestCode) {
         case REQUEST_CONNECT_DEVICE_SECURE:
@@ -349,16 +354,35 @@ public class BluetoothChat extends Activity {
         		finish();
         	}
         	break;
-        case REQUEST_PREFS:
+        case REQUEST_PREFS_SEC:
         	if(resultCode == Activity.RESULT_OK) {
         		mAge = data.getIntegerArrayListExtra(PrefsActivity.AGE);
         		mGender = data.getIntegerArrayListExtra(PrefsActivity.GENDER);
+        		intent = new Intent(this, DeviceListActivity.class);
+                intent.putExtra(PrefsActivity.AGE,mAge);
+                intent.putExtra(PrefsActivity.GENDER,mGender);
+                startActivityForResult(intent, REQUEST_CONNECT_DEVICE_SECURE);
         	} else { 
         		Log.d(TAG, "Prefs not ok");
         		Toast.makeText(this, "this failed,  Sorry", Toast.LENGTH_SHORT).show();
         		finish();
         	}
         	break;
+        case REQUEST_PREFS_INS:
+        	if(resultCode == Activity.RESULT_OK) {
+        		mAge = data.getIntegerArrayListExtra(PrefsActivity.AGE);
+        		mGender = data.getIntegerArrayListExtra(PrefsActivity.GENDER);
+        		intent = new Intent(this, DeviceListActivity.class);
+                intent.putExtra(PrefsActivity.AGE,mAge);
+                intent.putExtra(PrefsActivity.GENDER,mGender);
+                startActivityForResult(intent, REQUEST_CONNECT_DEVICE_INSECURE);
+        	} else { 
+        		Log.d(TAG, "Prefs not ok");
+        		Toast.makeText(this, "this failed,  Sorry", Toast.LENGTH_SHORT).show();
+        		finish();
+        	}
+        	break;
+        	
         }
     
     }
@@ -386,17 +410,18 @@ public class BluetoothChat extends Activity {
         switch (item.getItemId()) {
         case R.id.secure_connect_scan:
             // Launch the DeviceListActivity to see devices and do scan
-            serverIntent = new Intent(this, DeviceListActivity.class);
-            serverIntent.putExtra(PrefsActivity.AGE,mAge);
+        	serverIntent = new Intent(this, PrefsActivity.class);
+        	serverIntent.putExtra(PrefsActivity.AGE,mAge);
             serverIntent.putExtra(PrefsActivity.GENDER,mGender);
-            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+            startActivityForResult(serverIntent, REQUEST_PREFS_SEC);
+            
             return true;
         case R.id.insecure_connect_scan:
             // Launch the DeviceListActivity to see devices and do scan
-            serverIntent = new Intent(this, DeviceListActivity.class);
-            serverIntent.putExtra(PrefsActivity.AGE,mAge);
+        	serverIntent = new Intent(this, PrefsActivity.class);
+        	serverIntent.putExtra(PrefsActivity.AGE,mAge);
             serverIntent.putExtra(PrefsActivity.GENDER,mGender);
-            startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_INSECURE);
+            startActivityForResult(serverIntent, REQUEST_PREFS_SEC);
             return true;
         case R.id.discoverable:
             // Ensure this device is discoverable by others
@@ -411,7 +436,7 @@ public class BluetoothChat extends Activity {
         	return true;
         case R.id.prefs:
         	serverIntent = new Intent(this,PrefsActivity.class);
-        	startActivityForResult(serverIntent,REQUEST_PREFS);
+        	startActivityForResult(serverIntent,REQUEST_PREFS_SEC);
         	return true;
         case R.id.load:
         	//do stuff

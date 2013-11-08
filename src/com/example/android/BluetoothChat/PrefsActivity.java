@@ -42,6 +42,7 @@ public class PrefsActivity extends Activity {
 	private TextView mAgeText;
 	
 	private Button mButton;
+	private Button mButtonSelect;
 	
 	private ArrayList<Integer> mGender;
 	private ArrayList<Integer> mAge;
@@ -66,9 +67,16 @@ public class PrefsActivity extends Activity {
 		mAgeCheck8 = (CheckBox) findViewById(R.id.PrefsAgeCheckBox8);
 		
 		mButton = (Button) findViewById(R.id.PrefsButton1);
+		mButtonSelect = (Button) findViewById(R.id.PrefsSelectButton);
 		
-		mGender = new ArrayList<Integer>(0);
-		mAge = new ArrayList<Integer>(0);
+		Intent intent = getIntent();
+        mAge = intent.getIntegerArrayListExtra(PrefsActivity.AGE);
+        mGender = intent.getIntegerArrayListExtra(PrefsActivity.GENDER);
+        
+        //set initial values
+		
+        if(mGender == null)	mGender = new ArrayList<Integer>(0);
+		if(mAge == null) mAge = new ArrayList<Integer>(0);
 		
 
 		mGenderCheck1.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -159,6 +167,39 @@ public class PrefsActivity extends Activity {
 			    intent.putExtra(GENDER, mGender);
 				setResult(Activity.RESULT_OK, intent);
 				finish();
+			}
+		});
+		
+		mButtonSelect.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				if(!mGenderCheck1.isChecked() || !mGenderCheck2.isChecked() || !mAgeCheck1.isChecked() || !mAgeCheck2.isChecked() || !mAgeCheck3.isChecked() || !mAgeCheck4.isChecked() || !mAgeCheck5.isChecked() || !mAgeCheck6.isChecked() || !mAgeCheck7.isChecked() || !mAgeCheck8.isChecked()) {
+					mGenderCheck1.setChecked(true);
+					mGenderCheck2.setChecked(true);
+					mAgeCheck1.setChecked(true);
+					mAgeCheck2.setChecked(true);
+					mAgeCheck3.setChecked(true);
+					mAgeCheck4.setChecked(true);
+					mAgeCheck5.setChecked(true);
+					mAgeCheck6.setChecked(true);
+					mAgeCheck7.setChecked(true);
+					mAgeCheck8.setChecked(true);
+				}
+				else {
+					mGenderCheck1.setChecked(false);
+					mGenderCheck2.setChecked(false);
+					mAgeCheck1.setChecked(false);
+					mAgeCheck2.setChecked(false);
+					mAgeCheck3.setChecked(false);
+					mAgeCheck4.setChecked(false);
+					mAgeCheck5.setChecked(false);
+					mAgeCheck6.setChecked(false);
+					mAgeCheck7.setChecked(false);
+					mAgeCheck8.setChecked(false);
+					
+					mGender.clear();
+					mAge.clear();
+					
+				}
 			}
 		});
 	}
