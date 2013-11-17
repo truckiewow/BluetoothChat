@@ -69,14 +69,10 @@ public class PrefsActivity extends Activity {
 		mButton = (Button) findViewById(R.id.PrefsButton1);
 		mButtonSelect = (Button) findViewById(R.id.PrefsSelectButton);
 		
-		Intent intent = getIntent();
-        mAge = intent.getIntegerArrayListExtra(PrefsActivity.AGE);
-        mGender = intent.getIntegerArrayListExtra(PrefsActivity.GENDER);
-        
         //set initial values
 		
-        if(mGender == null)	mGender = new ArrayList<Integer>(0);
-		if(mAge == null) mAge = new ArrayList<Integer>(0);
+        mGender = new ArrayList<Integer>(0);
+		mAge = new ArrayList<Integer>(0);
 		
 
 		mGenderCheck1.setOnCheckedChangeListener(new OnCheckedChangeListener() {

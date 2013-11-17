@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -57,6 +58,7 @@ public class BluetoothChat extends Activity {
     public static final int MESSAGE_TOAST = 5;
 
     public static final String DEVICE_NAME = "device_name";
+    public static final String DEVICE_ADDRESS = "device_address";
     public static final String TOAST = "toast";
 
     // Intent request codes
@@ -89,6 +91,7 @@ public class BluetoothChat extends Activity {
     //public String IDString = "TESTHERE:";
     private ArrayList<Integer> mAge;
     private ArrayList<Integer> mGender;
+    private String mAddress;
 
 
     @Override
@@ -121,9 +124,7 @@ public class BluetoothChat extends Activity {
         mAge = new ArrayList<Integer>(0);
         mGender = new ArrayList<Integer>(0);
         
-        Intent intent = new Intent(this, UserInfoActivity.class);
-        startActivityForResult(intent, REQUEST_USER_INFO);
-    }
+        }
 
     @Override
     public void onStart() {
@@ -278,6 +279,7 @@ public class BluetoothChat extends Activity {
                 case BluetoothChatService.STATE_CONNECTED:
                     setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
                     mConversationArrayAdapter.clear();
+                    load();
                     break;
                 case BluetoothChatService.STATE_CONNECTING:
                     setStatus(R.string.title_connecting);
@@ -285,6 +287,7 @@ public class BluetoothChat extends Activity {
                 case BluetoothChatService.STATE_LISTEN:
                 case BluetoothChatService.STATE_NONE:
                     setStatus(R.string.title_not_connected);
+                    mConversationArrayAdapter.clear();
                     break;
                 }
                 break;
@@ -293,20 +296,25 @@ public class BluetoothChat extends Activity {
                 // construct a string from the buffer
                 String writeMessage = new String(writeBuf);
                 mConversationArrayAdapter.add("Me:  " + writeMessage);
+                store();
                 break;
             case MESSAGE_READ:
                 byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
                 mConversationArrayAdapter.add(mConnectedDeviceName+":  " + readMessage);
+                store();
                 break;
             case MESSAGE_DEVICE_NAME:
                 // save the connected device's name
             	temp = msg.getData().getString(DEVICE_NAME);
             	if(temp.matches(".*\\[" + getString(R.string.ID_String) + "[0-9]{2}]")) mConnectedDeviceName = temp.substring(0,temp.length()-6);
             	else mConnectedDeviceName = temp;
+            	mAddress = msg.getData().getString(DEVICE_ADDRESS);
                 Toast.makeText(getApplicationContext(), "Connected to "
                                + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                mConversationArrayAdapter.clear();
+                load();
                 break;
             case MESSAGE_TOAST:
                 Toast.makeText(getApplicationContext(), msg.getData().getString(TOAST),
@@ -317,8 +325,8 @@ public class BluetoothChat extends Activity {
     };
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	Intent intent = null;
         if(D) Log.d(TAG, "onActivityResult " + resultCode);
+        Intent intent;
         switch (requestCode) {
         case REQUEST_CONNECT_DEVICE_SECURE:
             // When DeviceListActivity returns with a device to connect
@@ -348,10 +356,11 @@ public class BluetoothChat extends Activity {
         	if(resultCode == Activity.RESULT_OK) {
         		String id_string = data.getStringExtra(UserInfoActivity.ID);
                 mBluetoothAdapter.setName(oldName+id_string);
+                boolean discoverable = data.getBooleanExtra("discoverable", false);
+                if(discoverable) ensureDiscoverable();
         	} else { 
         		Log.d(TAG, "User info not ok");
         		Toast.makeText(this, "this failed,  Sorry", Toast.LENGTH_SHORT).show();
-        		finish();
         	}
         	break;
         case REQUEST_PREFS_SEC:
@@ -365,7 +374,6 @@ public class BluetoothChat extends Activity {
         	} else { 
         		Log.d(TAG, "Prefs not ok");
         		Toast.makeText(this, "this failed,  Sorry", Toast.LENGTH_SHORT).show();
-        		finish();
         	}
         	break;
         case REQUEST_PREFS_INS:
@@ -379,7 +387,6 @@ public class BluetoothChat extends Activity {
         	} else { 
         		Log.d(TAG, "Prefs not ok");
         		Toast.makeText(this, "this failed,  Sorry", Toast.LENGTH_SHORT).show();
-        		finish();
         	}
         	break;
         	
@@ -389,10 +396,10 @@ public class BluetoothChat extends Activity {
 
     private void connectDevice(Intent data, boolean secure) {
         // Get the device MAC address
-        String address = data.getExtras()
+        mAddress = data.getExtras()
             .getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
         // Get the BluetoothDevice object
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(mAddress);
         // Attempt to connect to the device
         mChatService.connect(device, secure);
     }
@@ -425,24 +432,47 @@ public class BluetoothChat extends Activity {
             return true;
         case R.id.discoverable:
             // Ensure this device is discoverable by others
-            ensureDiscoverable();
+        	if(mBluetoothAdapter.getName().matches(".*\\["+ getString(R.string.ID_String) + "[0-9]{2}]" )) ensureDiscoverable();
+        	else {
+        		Intent intent = new Intent(this, UserInfoActivity.class);
+        		boolean discoverable = true;
+        		intent.putExtra("discoverable", discoverable);
+        		startActivityForResult(intent, REQUEST_USER_INFO);
+        	}
             return true;
         case R.id.user_info:
         	if(D) Log.i(TAG, "Attempting to load USER_INFO");
         	serverIntent = new Intent(this, UserInfoActivity.class);
+        	serverIntent.putExtra("discoverable", false);
         	if(D) Log.i(TAG, "After Creating intent");
         	startActivityForResult(serverIntent,REQUEST_USER_INFO);
         	if(D) Log.i(TAG, "After attempting to load USER_INFO");
-        	return true;
-        case R.id.prefs:
-        	serverIntent = new Intent(this,PrefsActivity.class);
-        	startActivityForResult(serverIntent,REQUEST_PREFS_SEC);
-        	return true;
-        case R.id.load:
-        	//do stuff
-            return true;
+        	return true; 
         }
         return false;
+    }
+    
+    private void store() {
+    	String outString = "", str = "";
+    	for(int i=0; i<mConversationArrayAdapter.getCount(); i++) {
+    		str = mConversationArrayAdapter.getItem(i);
+    		outString += str + "\n";
+    	}
+    	SharedPreferences messages = getSharedPreferences(mAddress, 0);
+    	SharedPreferences.Editor editor = messages.edit();
+    	editor.putString(mAddress, outString);
+    	editor.commit();
+    }
+    
+    private void load() {
+    	String inString, str[];
+    	SharedPreferences messages = getSharedPreferences(mAddress, 0);
+    	inString = messages.getString(mAddress, "");
+    	str = inString.split("\n");
+    	for(String s : str) {
+    		mConversationArrayAdapter.add(s);
+    	}
+    	
     }
 
 }

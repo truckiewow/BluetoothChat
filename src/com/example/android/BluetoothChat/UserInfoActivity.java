@@ -1,8 +1,8 @@
 package com.example.android.BluetoothChat;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -60,6 +60,17 @@ public class UserInfoActivity extends Activity {
 		mAgeRadio7 = (RadioButton) findViewById(R.id.userInfoAgeRadioButton7);
 		mAgeRadio8 = (RadioButton) findViewById(R.id.userInfoAgeRadioButton8);
 		
+		SharedPreferences UserVals = getSharedPreferences("UserVal", 0);
+		
+		int gender = Integer.parseInt(UserVals.getString("Gender", "1"));
+		int age = Integer.parseInt(UserVals.getString("Age", "1"));
+		
+		
+		
+		Intent intent = getIntent();
+		
+		final boolean discoverable = intent.getBooleanExtra("discoverable", false);
+		
 		mGenderRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
 		{
 			public void onCheckedChanged(RadioGroup rG, int checked) {
@@ -95,10 +106,21 @@ public class UserInfoActivity extends Activity {
 			    ID_string += mAge + "]";
 			    Intent intent = new Intent();
 			    intent.putExtra(ID, ID_string);
+			    intent.putExtra("discoverable", discoverable);
+			    
+			    SharedPreferences UserVals = getSharedPreferences("UserVal", 0);
+			    SharedPreferences.Editor editor = UserVals.edit();
+			    editor.putString("Gender", mGender);
+			    editor.putString("Age", mAge);
+			    editor.commit();
+			    
 				setResult(Activity.RESULT_OK, intent);
 				finish();
 			}
 		});
+		
+		((RadioButton) findViewById(R.id.userInfoAgeRadioGroup1 + age + 1)).setChecked(true);
+		((RadioButton) findViewById(R.id.userInfoGenderRadioGroup1 + gender + 1)).setChecked(true);
 		
 	}
 	

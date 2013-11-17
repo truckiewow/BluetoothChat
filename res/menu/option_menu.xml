@@ -27,13 +27,6 @@
           android:title="@string/discoverable"
           android:showAsAction="ifRoom|withText" />
     <item android:id="@+id/user_info"
-          android:icon="@android:drawable/ic_menu_mylocation"
           android:title="@string/user_info_button"
-          android:showAsAction="ifRoom|withText" />
-    <item android:id="@+id/prefs"
-          android:title="@string/prefs_button"
-          android:showAsAction="ifRoom|withText" />
-    <item android:id="@+id/load"
-          android:title="Load Messages"
           android:showAsAction="ifRoom|withText" />
 </menu>
