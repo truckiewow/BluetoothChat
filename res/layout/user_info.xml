@@ -32,7 +32,40 @@
 	        android:textColor="#fff"
 	        android:textSize="20sp" />
 	
+	  	<RadioGroup 
+	        android:id="@+id/userInfoGenderRadioGroup1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignLeft="@+id/userInfoGenderTextView1"
+	        android:layout_below="@+id/userInfoGenderTextView1"
+	        android:layout_marginLeft="20dp">"
+		    <RadioButton
+		        android:id="@+id/userInfoGenderRadioButton1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/pref_gender1" />
+		    
+		    <RadioButton
+		        android:id="@+id/userInfoGenderRadioButton2"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/pref_gender2" />
+		</RadioGroup>
 	  
+	    	    
+		
+	
+	
+	    <TextView
+	        android:id="@+id/userInfoAgeTextView1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_below="@+id/userInfoGenderRadioGroup1"
+	        android:layout_marginTop="10dp"
+	        android:text="Select Age (years):"
+	        android:textSize="20sp" />
+	    
 	    <RadioGroup
 	        android:id="@+id/userInfoAgeRadioGroup1"
 	        android:layout_width="wrap_content"
@@ -90,39 +123,7 @@
 		        android:layout_height="wrap_content"
 		        android:text="@string/pref_age8" />
 		  </RadioGroup>
-		    
-		
 	
-	
-	    <TextView
-	        android:id="@+id/userInfoAgeTextView1"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentLeft="true"
-	        android:layout_below="@+id/userInfoGenderRadioGroup1"
-	        android:layout_marginTop="10dp"
-	        android:text="Select Age (years):"
-	        android:textSize="20sp" />
-	    
-	    <RadioGroup 
-	        android:id="@+id/userInfoGenderRadioGroup1"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignLeft="@+id/userInfoGenderTextView1"
-	        android:layout_below="@+id/userInfoGenderTextView1"
-	        android:layout_marginLeft="20dp">"
-		    <RadioButton
-		        android:id="@+id/userInfoGenderRadioButton1"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/pref_gender1" />
-		    
-		    <RadioButton
-		        android:id="@+id/userInfoGenderRadioButton2"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/pref_gender2" />
-		</RadioGroup>
 		      <Button
 	        android:id="@+id/userInfoButton1"
 	        android:layout_width="match_parent"

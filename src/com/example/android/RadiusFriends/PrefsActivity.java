@@ -1,4 +1,4 @@
-package com.example.android.BluetoothChat;
+package com.example.android.RadiusFriends;
 
 import java.util.ArrayList;
 

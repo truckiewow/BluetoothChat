@@ -1,4 +1,4 @@
-package com.example.android.BluetoothChat;
+package com.example.android.RadiusFriends;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import com.example.android.RadiusFriends.R;
 
 public class UserInfoActivity extends Activity {
 	private static final boolean D = true;
@@ -62,8 +64,8 @@ public class UserInfoActivity extends Activity {
 		
 		SharedPreferences UserVals = getSharedPreferences("UserVal", 0);
 		
-		int gender = Integer.parseInt(UserVals.getString("Gender", "1"));
-		int age = Integer.parseInt(UserVals.getString("Age", "1"));
+		int gender = Integer.parseInt(UserVals.getString("Gender", "0"));
+		int age = Integer.parseInt(UserVals.getString("Age", "0"));
 		
 		
 		
